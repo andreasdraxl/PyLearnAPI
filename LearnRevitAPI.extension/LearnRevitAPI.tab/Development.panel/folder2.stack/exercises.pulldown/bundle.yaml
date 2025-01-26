@@ -1,0 +1,26 @@
+layout:
+  - AllElementsOnWorkset
+  - DeleteAllLinks
+  - DeleteLinks
+  - DimensionSegment
+  - ElementIntersection
+  - FindElementsByValue
+  - FireRatings
+  - GetLinkedElement
+  - GetLinkedRooms
+  - GrossArea
+  - GroupByCategoryAPI
+  - IfcMultiViewExport
+  - MathPlottLib
+  - PurgeUnusedParameter
+  - PyRevit
+  - RenameFamilies
+  - RenameObjectStyle
+  - SecondButton
+  - STUK_Check
+  - TransactionCrash
+  - ViewTemplate
+  - LinkedRooms
+  - FileSize
+  - IfcGUID
+  - IfcSpatialContainer

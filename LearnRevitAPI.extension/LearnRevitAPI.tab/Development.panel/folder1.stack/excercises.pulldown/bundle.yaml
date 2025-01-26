@@ -1,0 +1,8 @@
+layout:
+  - CableTrayProperties
+  - collectAndHighLight
+  - GetRoofPerimeter
+  - GetShaft
+  - GroupBy
+  - GetAllInView
+  

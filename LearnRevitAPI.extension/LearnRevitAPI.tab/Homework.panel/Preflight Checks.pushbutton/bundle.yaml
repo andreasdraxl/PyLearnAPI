@@ -1,0 +1,11 @@
+tooltip:
+  en_us: Run builtin or custom preflight checks on your models
+
+title:
+  en_us: >-
+    Preflight
+  
+    Checks
+authors:
+  - '{{author}}'
+help_url: https://www.notion.so/pyrevitlabs/Extension-Checks-0cf10ac6717b41f2915fe3341f05a223

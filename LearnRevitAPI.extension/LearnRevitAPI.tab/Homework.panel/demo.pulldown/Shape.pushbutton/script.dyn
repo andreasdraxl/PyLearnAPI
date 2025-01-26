@@ -1,0 +1,381 @@
+{
+  "Uuid": "fbda61f1-40ad-47a1-bd69-afb76a2a6b59",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "script",
+  "ElementResolver": {
+    "ResolutionMap": {
+      "DSCore.Data.Object": {
+        "Key": "DSCore.Data",
+        "Value": "DSCoreNodes.dll"
+      },
+      "DSCore.Data": {
+        "Key": "DSCore.Data",
+        "Value": "DSCoreNodes.dll"
+      },
+      "List": {
+        "Key": "List",
+        "Value": "BuiltIn.ds"
+      },
+      "DSCore.Object": {
+        "Key": "DSCore.Object",
+        "Value": "DSCoreNodes.dll"
+      }
+    }
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Revit.Elements.Element.Geometry",
+      "Id": "c8b4e2d3c96c432a9b324f52f66864e4",
+      "Inputs": [
+        {
+          "Id": "7c2e31fd773542f9877a307d8f0b72bb",
+          "Name": "element",
+          "Description": "Revit.Elements.Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "1d2c9344d7b844458e0a7de10d7472d9",
+          "Name": "var[]",
+          "Description": "var[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Get all of the Geometry associated with this object\n\nElement.Geometry ( ): var[]"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "NodeType": "CodeBlockNode",
+      "Code": "filter = DSCore.Object.Type(x) == \"Autodesk.DesignScript.Geometry.Solid\" ? x : null;\nOUT = List.Clean(filter, false);",
+      "Id": "c14af798cb194f4ca58f7167a3301524",
+      "Inputs": [
+        {
+          "Id": "1107badb2f544f009fa31f104d60d741",
+          "Name": "x",
+          "Description": "x",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "36332cb0f225434f96fbe0bd3dba1bf9",
+          "Name": "",
+          "Description": "filter",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "293a99c5d4fa4946b587a4cf2486a4c2",
+          "Name": "",
+          "Description": "OUT",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Autodesk.DesignScript.Geometry.Solid.ByUnion@Autodesk.DesignScript.Geometry.Solid[]",
+      "Id": "9fc0af8307c845dd9b98c7748386fbe3",
+      "Inputs": [
+        {
+          "Id": "dc7572b58f8740808f380b9c66d21e12",
+          "Name": "solids",
+          "Description": "A collection of solids\n\nSolid[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "9f35518de19c4028aae42e2d705cb057",
+          "Name": "Solid",
+          "Description": "Solid",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Union a collection of solids into one solid\n\nSolid.ByUnion (solids: Solid[]): Solid"
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "import clr\r\n\r\nclr.AddReference('RevitAPI')\r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.DB.Structure import *\r\n\r\nclr.AddReference('RevitAPIUI')\r\nfrom Autodesk.Revit.UI import *\r\n\r\nclr.AddReference('System')\r\nfrom System.Collections.Generic import List\r\n\r\nclr.AddReference('RevitNodes')\r\nimport Revit\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.ImportExtensions(Revit.Elements)\r\n\r\nclr.AddReference('RevitServices')\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager\r\nfrom RevitServices.Transactions import TransactionManager\r\nfrom Autodesk.Revit.UI.Selection import ObjectType\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuidoc=DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument\r\nselection = uidoc.Selection #type: Selection\r\n\r\n\r\nref_picked_object = selection.PickObject(ObjectType.Element)\r\npicked_object     = doc.GetElement(ref_picked_object)\r\n\r\nOUT = picked_object",
+      "Engine": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "522ece9ec5d24637be16325909e2c3e8",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "aca41c7807f540139008fb177d1355cc",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Autodesk.Dynamo.MeshToolkit.Mesh.ByGeometry@Autodesk.DesignScript.Geometry.Geometry,double,int",
+      "Id": "22c486171f794024a84ce3135fce3134",
+      "Inputs": [
+        {
+          "Id": "f94a9ee13cc746ffb3e245b5c8a176a6",
+          "Name": "inputGeometry",
+          "Description": "Geometry",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "e2fbac971c0b4b8887c006a69480cebf",
+          "Name": "tolerance",
+          "Description": "double\nDefault value : -1",
+          "UsingDefaultValue": true,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "2cad5cd35da24ca1a3d8a162543e4e12",
+          "Name": "maxGridLines",
+          "Description": "int\nDefault value : 512",
+          "UsingDefaultValue": true,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "e7d3f7884594428589b6311a7daa7f22",
+          "Name": "Mesh",
+          "Description": "Mesh",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Convert a Geometry object such as a Solid or Surface into a Mesh. The resolution of the mesh is determined by the Dynamo render precision\n\nMesh.ByGeometry (inputGeometry: Geometry, tolerance: double = -1, maxGridLines: int = 512): Mesh"
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "import clr\r\nimport sys\r\nimport System\r\nclr.AddReference(\"System.Numerics\")\r\n\r\nclr.AddReference('HelixToolkit')\r\nclr.AddReference('SharpDX.Mathematics')\r\nclr.AddReference('HelixToolkit.Core.Wpf')\r\nclr.AddReference('HelixToolkit.SharpDX.Core')\r\nclr.AddReference('HelixToolkit.SharpDX.Core.Wpf')\r\nfrom HelixToolkit import *\r\nfrom HelixToolkit.Wpf.SharpDX import *\r\nfrom HelixToolkit.SharpDX.Core import *\r\nfrom SharpDX import *\r\nimport SharpDX\r\n#\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\nimport Autodesk.DesignScript.Geometry as DS\r\n\r\n\r\nclr.AddReference(\"System.Core\")\r\nclr.ImportExtensions(System.Linq)\r\nclr.AddReference(\"IronPython.Wpf\")\r\nclr.AddReference('System.Core')\r\nclr.AddReference('System.Xml')\r\nclr.AddReference('PresentationCore')\r\nclr.AddReference('PresentationFramework')\r\nclr.AddReferenceByPartialName(\"WindowsBase\")\r\n\r\n    \r\nfrom System.IO import StringReader\r\nfrom System.Windows.Markup import XamlReader, XamlWriter\r\nfrom System.Windows import Window, Application\r\n\r\ntry:\r\n    import wpf\r\n    import time\r\nexcept ImportError:\r\n    wpf = None\r\n\r\n\r\nclass MeshViewer(Window):\r\n    LAYOUT = '''\r\n    <Window xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" \r\n        xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"\r\n        xmlns:hx=\"http://helix-toolkit.org/wpf\"\r\n        Title=\"...\"\r\n        Height=\"700\"\r\n        Width=\"600\">\r\n        <Grid>\r\n        <Viewbox Grid.Row=\"0\">\r\n            <hx:HelixViewport3D \r\n                Height=\"400\" \r\n                Width=\"400\" \r\n                VerticalAlignment=\"Bottom\" \r\n                ZoomExtentsWhenLoaded=\"True\"  \r\n                CameraRotationMode=\"Trackball\" \r\n                IsViewCubeEdgeClicksEnabled=\"True\" \r\n                ZoomAroundMouseDownPoint=\"True\" \r\n                 Margin=\"5,35,5,2\">\r\n                <hx:DefaultLights/>\r\n                <ModelVisual3D>\r\n                    <ModelVisual3D.Content>\r\n                        <GeometryModel3D x:Name=\"model3D\">\r\n                            <GeometryModel3D.Geometry >\r\n                                <MeshGeometry3D x:Name=\"meshMain\">\r\n                                </MeshGeometry3D>\r\n                            </GeometryModel3D.Geometry>\r\n                             <GeometryModel3D.Material>\r\n                             <DiffuseMaterial x:Name=\"matDiffuseMain\">\r\n                                    <DiffuseMaterial.Brush>\r\n                                        <SolidColorBrush Color=\"Gray\"/>\r\n                                    </DiffuseMaterial.Brush>\r\n                                </DiffuseMaterial>\r\n                        </GeometryModel3D.Material>\r\n                        </GeometryModel3D>\r\n                    </ModelVisual3D.Content>\r\n                </ModelVisual3D>\r\n                <hx:GridLinesVisual3D Width=\"8\" Length=\"8\" MinorDistance=\"1\" MajorDistance=\"1\" Thickness=\"0.01\"/>\r\n            </hx:HelixViewport3D >\r\n        </Viewbox>\r\n        </Grid>\r\n    </Window>\r\n    '''\r\n    \r\n    def __init__(self, mesh):\r\n        self.ui = wpf.LoadComponent(self, StringReader(MeshViewer.LAYOUT))\r\n        self.mesh = mesh\r\n        self.Title = \"3D Viewer\"\r\n        indices = System.Windows.Media.Int32Collection([System.Int32(i) for i in mesh.VertexIndicesByTri()])\r\n        positions = System.Windows.Media.Media3D.Point3DCollection([System.Windows.Media.Media3D.Point3D(p.X, p.Y, p.Z) for p in mesh.Vertices()])\r\n        self.meshMain.TriangleIndices = indices\r\n        self.meshMain.Positions = positions\r\n        \r\nif wpf is not None:\r\n    input_mesh = IN[0]\r\n    mesh_viewer = MeshViewer(input_mesh)\r\n    mesh_viewer.Show()",
+      "Engine": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "4ed4b99dcb7b4fba912adb036b9a9b75",
+      "Inputs": [
+        {
+          "Id": "42ad221328654e909513112dbf288f2f",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "7b94bf86cd8c408bbee7afa1ac2f74a0",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "1d2c9344d7b844458e0a7de10d7472d9",
+      "End": "1107badb2f544f009fa31f104d60d741",
+      "Id": "d7da572ee78547f6adb173fcd32f48c4"
+    },
+    {
+      "Start": "293a99c5d4fa4946b587a4cf2486a4c2",
+      "End": "dc7572b58f8740808f380b9c66d21e12",
+      "Id": "5b4dd64bfc7247e49859e1a9406403a0"
+    },
+    {
+      "Start": "9f35518de19c4028aae42e2d705cb057",
+      "End": "f94a9ee13cc746ffb3e245b5c8a176a6",
+      "Id": "b7b471ed43e5445abc7d4ea762143390"
+    },
+    {
+      "Start": "aca41c7807f540139008fb177d1355cc",
+      "End": "7c2e31fd773542f9877a307d8f0b72bb",
+      "Id": "3c2b3ce3b9ed42eaa0e119f44ea474a3"
+    },
+    {
+      "Start": "e7d3f7884594428589b6311a7daa7f22",
+      "End": "42ad221328654e909513112dbf288f2f",
+      "Id": "1f652cc03a504592a4ec983def63e076"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [
+    {
+      "Name": "MeshToolkit",
+      "Version": "3.0.0",
+      "ReferenceType": "Package",
+      "Nodes": [
+        "22c486171f794024a84ce3135fce3134"
+      ]
+    }
+  ],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.0",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "7.1",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.12.0.5650",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": 53.540855407714844,
+      "EyeY": 2.0662722587585449,
+      "EyeZ": 1.6035122871398926,
+      "LookX": -1.2990798950195313,
+      "LookY": -3.3452067375183105,
+      "LookZ": -2.1999917030334473,
+      "UpX": -0.40407872200012207,
+      "UpY": 0.60696613788604736,
+      "UpZ": -0.6843336820602417
+    },
+    "NodeViews": [
+      {
+        "ShowGeometry": true,
+        "Name": "Element.Geometry",
+        "Id": "c8b4e2d3c96c432a9b324f52f66864e4",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 631.61253821398759,
+        "Y": 57.064967132029778
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Code Block",
+        "Id": "c14af798cb194f4ca58f7167a3301524",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 846.55274052407481,
+        "Y": 59.964736649043459
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Solid.ByUnion",
+        "Id": "9fc0af8307c845dd9b98c7748386fbe3",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1573.8601814198382,
+        "Y": 71.705998426736187
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "PyPickObject",
+        "Id": "522ece9ec5d24637be16325909e2c3e8",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 476.96023677479769,
+        "Y": 56.774786416555628
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Mesh.ByGeometry",
+        "Id": "22c486171f794024a84ce3135fce3134",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1768.3374339833788,
+        "Y": 71.870262365321878
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "3DShape",
+        "Id": "4ed4b99dcb7b4fba912adb036b9a9b75",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 2019.9262830421662,
+        "Y": 71.678300015207924
+      }
+    ],
+    "Annotations": [],
+    "X": -202.00512746170665,
+    "Y": 136.31282855623118,
+    "Zoom": 1.0499559384693691
+  }
+}
