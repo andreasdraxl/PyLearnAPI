@@ -25,8 +25,36 @@ app   = __revit__.Application                 # Represents the Autodesk Revit Ap
 PATH_SCRIPT = os.path.dirname(__file__)
 
 
-levels = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements()
-level_names = [i.Name for i in levels]
+unfiltered_levels = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements()
+unfiltered_level_names = [i.Name for i in levels]
 
-print(levels)
-print(level_names)
+
+level_names_index = []
+level_names = []
+levels =[]
+
+for i,item in enumerate(unfiltered_level_names):
+    if "RDOK" in item:
+        level_names_index.append(i)
+
+
+for i in level_names_index:
+    levels.append(unfiltered_levels[i])
+
+# 0️⃣ Project specific
+matching = []
+buildingparts = {}
+
+for item in levels:
+    element_per_level = item.LookupParameter("Bauteil").AsString()
+
+    if element_per_level not in buildingparts:
+        buildingparts[element_per_level] = 0
+    else:
+        buildingparts[element_per_level] += 1
+    
+    if item.LookupParameter("Gebäudegeschoss").AsInteger() == 1:
+        matching.append(item)
+
+print(matching)
+print(buildingparts)
