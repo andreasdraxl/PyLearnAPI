@@ -26,7 +26,7 @@ PATH_SCRIPT = os.path.dirname(__file__)
 
 
 unfiltered_levels = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements()
-unfiltered_level_names = [i.Name for i in levels]
+unfiltered_level_names = [i.Name for i in unfiltered_levels]
 
 
 level_names_index = []
