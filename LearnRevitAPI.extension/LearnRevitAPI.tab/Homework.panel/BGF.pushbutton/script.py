@@ -58,8 +58,17 @@ for item in levels:
         matching.append(item)
     
 
-    # 🔓🔐 create area plans
-    
+# 🔓🔐 create area plans
 
+created_views = []
 
+with revit.Transaction("create floorplans"):
+    try:
+        for level in levels:
+            new_area_plan = ViewPlan.CreateAreaPlan(doc, area_scheme.Id, level.Id)
+            new_area_plan.Name = "Flächenplan - {level.Name}"
 
+        created_views.append(new_area_plan.Name)
+    except:
+        import traceback
+        print(traceback.format_exc())
