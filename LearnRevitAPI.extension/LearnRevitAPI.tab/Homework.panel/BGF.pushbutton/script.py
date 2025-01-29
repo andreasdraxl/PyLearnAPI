@@ -72,7 +72,7 @@ with revit.Transaction("create floorplans"):
     try:
         for level in levels:
             new_area_plan = ViewPlan.CreateAreaPlan(doc, area_scheme.Id, level.Id)
-            new_area_plan.Name = "Flaechenplan_" + str(level.Name)
+            new_area_plan.Name = str(level.Name) + " - BGF Kontrollansicht"
 
         created_views.append(new_area_plan.Name)
     except:
