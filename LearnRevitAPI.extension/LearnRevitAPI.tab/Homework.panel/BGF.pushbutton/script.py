@@ -44,7 +44,7 @@ for i in level_names_index:
 
 # 0️⃣ Project specific
 matching = []
-buildingparts = []
+buildingparts = {}
 
 for item in levels:
     element_per_level = item.LookupParameter("Bauteil").AsString()
@@ -58,7 +58,7 @@ for item in levels:
         matching.append(item)
     
     print(matching)
-    print(len(matching))
+    print(len(matching.keys))
 
 
 
