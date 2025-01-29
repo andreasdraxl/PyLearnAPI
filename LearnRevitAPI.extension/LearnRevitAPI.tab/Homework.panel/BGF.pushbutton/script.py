@@ -54,8 +54,10 @@ for item in levels:
     else:
         buildingparts[element_per_level] += 1
     
-    if item.LookupParameter("Gebäudegeschoss").AsInteger() == 1:
+    if item.LevelIsBuildingStory == 1:
         matching.append(item)
+    
+    print(matching)
 
 
 
