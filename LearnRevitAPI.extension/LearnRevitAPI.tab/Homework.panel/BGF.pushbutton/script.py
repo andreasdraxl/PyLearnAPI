@@ -78,3 +78,5 @@ with revit.Transaction("create floorplans"):
     except:
         import traceback
         print(traceback.format_exc())
+
+# 0️⃣ create dummy rooms
