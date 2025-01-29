@@ -59,6 +59,6 @@ for item in levels:
 
 ##print(matching)
 #print(buildingparts)
-for i in (dir(uidoc)):
+for i in (dir(revit)):
     print(i)
 
