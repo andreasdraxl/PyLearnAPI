@@ -59,6 +59,12 @@ for item in levels:
     
 
 # 🔓🔐 create area plans
+area_schemes = FilteredElementCollector(doc).OfClass(AreaScheme).ToElements()
+search_area_scheme = [i for i in area_schemes if i.Name == "Vermietbar"]
+area_scheme = search_area_scheme[0]
+
+for i in area_schemes:
+    print(i.Name)
 
 created_views = []
 
@@ -66,7 +72,7 @@ with revit.Transaction("create floorplans"):
     try:
         for level in levels:
             new_area_plan = ViewPlan.CreateAreaPlan(doc, area_scheme.Id, level.Id)
-            new_area_plan.Name = "Flächenplan - {level.Name}"
+            new_area_plan.Name = "Flaechenplan_" + str(level.Name)
 
         created_views.append(new_area_plan.Name)
     except:
