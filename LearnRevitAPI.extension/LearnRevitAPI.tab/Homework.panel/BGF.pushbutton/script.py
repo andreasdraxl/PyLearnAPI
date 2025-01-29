@@ -54,7 +54,7 @@ for item in levels:
     else:
         buildingparts[element_per_level] += 1
     
-    if item.LevelIsBuildingStory().AsInteger() == 1:
+    if item.get_Parameter(BuiltInParameter.LEVEL_IS_BUILDING_STORY).AsInteger() == 1:
         matching.append(item)
     
     print(matching)
