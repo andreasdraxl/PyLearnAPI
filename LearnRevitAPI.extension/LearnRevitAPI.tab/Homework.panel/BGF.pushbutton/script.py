@@ -57,8 +57,8 @@ for item in levels:
     if item.get_Parameter(BuiltInParameter.LEVEL_IS_BUILDING_STORY).AsInteger() == 1:
         matching.append(item)
     
-    print(len(matching))
-    print(buildingparts)
+for i in matching:
+    print(i)
     
 
 
