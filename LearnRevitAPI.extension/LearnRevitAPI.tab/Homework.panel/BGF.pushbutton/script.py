@@ -57,8 +57,5 @@ for item in levels:
     if item.LookupParameter("Gebäudegeschoss").AsInteger() == 1:
         matching.append(item)
 
-##print(matching)
-#print(buildingparts)
-for i in (dir(app)):
-    print(i)
+
 
