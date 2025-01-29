@@ -44,7 +44,7 @@ for i in level_names_index:
 
 # 0️⃣ Project specific
 matching = []
-buildingparts = {}
+buildingparts = []
 
 for item in levels:
     element_per_level = item.LookupParameter("Bauteil").AsString()
