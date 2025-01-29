@@ -1,64 +1,72 @@
 # -*- coding: utf-8 -*-
-__title__ = "BGF"
-__doc__ = """Version = 1.0
-Date    = 20.04.2022
+__title__ = "BGF - Flächenplan"
+__doc__ = """Version = 1.1
+Date    = 29.01.2025
 Author: Andreas Draxl"""
 
-# Regular + Autodesk
-import os, sys, math, datetime, time                                    # Regular Imports
-from Autodesk.Revit.DB import *                                         # Import everything from DB (Very good for beginners)
-from Autodesk.Revit.DB import Transaction, FilteredElementCollector     # or Import only classes that are used.
+# 📌 Imports
+import os
+import clr  # Zugriff auf .NET
+clr.AddReference("System")
+clr.AddReference("RevitServices")
+clr.AddReference("RevitNodes")
 
-# pyRevit
-from pyrevit import revit, forms                                        # import pyRevit modules. (Lots of useful features)
-
-
-# .NET Imports
-import clr                                  # Common Language Runtime. Makes .NET libraries accessinble
-clr.AddReference("System")                  # Refference System.dll for import.
 from System.Collections.Generic import List
+from Autodesk.Revit.DB import *
+from Autodesk.Revit.UI import TaskDialog
+from pyrevit import revit, forms
 
-# Document reference
-doc   = __revit__.ActiveUIDocument.Document   # Document   class from RevitAPI that represents project. Used to Create, Delete, Modify and Query elements from the project.
-uidoc = __revit__.ActiveUIDocument          # UIDocument class from RevitAPI that represents Revit project opened in the Revit UI.
-app   = __revit__.Application                 # Represents the Autodesk Revit Application, providing access to documents, options and other application wide data and settings.
-PATH_SCRIPT = os.path.dirname(__file__)
+# 🚀 Dokumentreferenz
+doc = __revit__.ActiveUIDocument.Document
+uidoc = __revit__.ActiveUIDocument
 
+# 🎯 Alle Ebenen sammeln
+unfiltered_levels = FilteredElementCollector(doc) \
+    .OfCategory(BuiltInCategory.OST_Levels) \
+    .WhereElementIsNotElementType() \
+    .ToElements()
 
-unfiltered_levels = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements()
-unfiltered_level_names = [i.Name for i in unfiltered_levels]
+# 🔍 Nur Ebenen mit "RDOK" im Namen filtern
+levels = [lvl for lvl in unfiltered_levels if "RDOK" in lvl.Name]
 
+# ❗ Prüfen, ob Ebenen vorhanden sind
+if not levels:
+    TaskDialog.Show("Fehler", "Keine passenden Ebenen gefunden!")
+    script.exit()
 
-level_names_index = []
-level_names = []
-# output to continue
-levels =[]
+# 🎯 Passendes Flächenschema (Area Scheme) finden
+area_schemes = FilteredElementCollector(doc).OfClass(AreaScheme).ToElements()
 
-for i,item in enumerate(unfiltered_level_names):
-    if "RDOK" in item:
-        level_names_index.append(i)
+# ❗ Falls kein Flächenschema vorhanden ist, abbrechen
+if not area_schemes:
+    TaskDialog.Show("Fehler", "Kein Flächenschema gefunden!")
+    script.exit()
 
+# ✅ Erstes Flächenschema nehmen
+area_scheme = area_schemes[0]  # Falls mehrere vorhanden sind, evtl. Auswahl durch den Nutzer
 
-for i in level_names_index:
-    levels.append(unfiltered_levels[i])
+# 🛠 Transaktion starten
+t = Transaction(doc, "Flächenpläne erstellen")
+t.Start()
 
-# 0️⃣ Project specific
-matching = []
-buildingparts = {}
+created_views = []
 
-for item in levels:
-    element_per_level = item.LookupParameter("Bauteil").AsString()
+try:
+    for level in levels:
+        # 🏗 Neuen Flächenplan erstellen
+        new_area_plan = ViewPlan.CreateAreaPlan(doc, area_scheme.Id, level.Id)
 
-    if element_per_level not in buildingparts:
-        buildingparts[element_per_level] = 0
-    else:
-        buildingparts[element_per_level] += 1
+        # 📌 Namen setzen
+        new_area_plan.Name = f"Flächenplan - {level.Name}"
+
+        # 📌 Hinzufügen zur Liste
+        created_views.append(new_area_plan.Name)
+
+    t.Commit()
     
-    if item.get_Parameter(BuiltInParameter.LEVEL_IS_BUILDING_STORY).AsInteger() == 1:
-        matching.append(item)
-    
+    # ✅ Erfolgsmeldung
+    TaskDialog.Show("Erfolg", f"Flächenpläne erstellt:\n" + "\n".join(created_views))
 
-    
-
-
-
+except Exception as e:
+    t.RollBack()
+    TaskDialog.Show("Fehler", f"Ein Fehler ist aufgetreten:\n{str(e)}")
