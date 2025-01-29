@@ -58,7 +58,7 @@ for item in levels:
         matching.append(item)
     
     print(matching)
-    print(len(matching.keys))
+    print(len(matching))
 
 
 
