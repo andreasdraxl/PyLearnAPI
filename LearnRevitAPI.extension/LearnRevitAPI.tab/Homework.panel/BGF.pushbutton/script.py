@@ -101,4 +101,4 @@ for i in unique_wall:
     print(i)
 
 
-# 0️⃣ create dummy rooms
+# 2️⃣ create dummy rooms
