@@ -24,6 +24,7 @@ uidoc = __revit__.ActiveUIDocument          # UIDocument class from RevitAPI tha
 app   = __revit__.Application                 # Represents the Autodesk Revit Application, providing access to documents, options and other application wide data and settings.
 PATH_SCRIPT = os.path.dirname(__file__)
 
+UIunit = doc.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId()
 
 unfiltered_levels = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements()
 unfiltered_level_names = [i.Name for i in unfiltered_levels]
@@ -31,6 +32,7 @@ unfiltered_level_names = [i.Name for i in unfiltered_levels]
 
 level_names_index = []
 level_names = []
+
 # output to continue
 levels =[]
 
@@ -79,12 +81,15 @@ with revit.Transaction("create floorplans"):
 
 # 1️⃣ all walls at level
 unique_wall = []
+list_level = []
+
+
 
 for level in matching:
     level_filter = ElementLevelFilter(level.Id)
+    list_level.append(level)
     
     element_per_level = FilteredElementCollector(doc).WherePasses(level_filter).WhereElementIsNotElementType().ToElements()
-    # check = [i.Category.Name for i in element_per_level]
     wall_per_level_and_Bauteil = []
     
     
@@ -96,9 +101,55 @@ for level in matching:
                 
     if wall_per_level_and_Bauteil:
         unique_wall.append(wall_per_level_and_Bauteil[0])
-        
-for i in unique_wall:
-    print(i)
 
 
-# 2️⃣ create dummy rooms
+associated_level = []
+
+#for i in matching:
+
+# 2️⃣ create dummy rooms for BGF
+
+def create_lines(z):
+    x, y = 100, 100  
+    A = XYZ(x, y, z)
+    B = XYZ(-x, y, z)
+    C = XYZ(x, -y, z)
+    D = XYZ(-x, -y, z)
+    
+    curves = [Line.CreateBound(B, A), Line.CreateBound(A, C), Line.CreateBound(C, D), Line.CreateBound(D, B)]  
+    return curves
+
+# 🔹 Raumbegrenzungslinien für jede Ebene erstellen
+
+roomCreationData = []
+
+with revit.Transaction("Erstelle Raumbegrenzungen"):
+    for level in levels:
+        print(level)
+        height_param = level.LookupParameter("Höhe")
+        if height_param:
+            z = height_param.AsDouble() / 3.281  # Umrechnung von Fuß in Meter
+            hoehe = UnitUtils.ConvertFromInternalUnits(z, UIunit)
+
+            # Passende Grundrissansicht finden
+            view = next((combo[1] for combo in associated_level if combo[0].Name == level.Name), None)
+            if not view:
+                continue
+
+            # 🔹 Begrenzungslinien erstellen
+            curves = create_lines(z)
+            curvearray = CurveArray()
+            for curve in curves:
+                curvearray.Append(curve)
+
+            # 🔹 SketchPlane erstellen
+            pl = Plane.CreateByThreePoints(XYZ(100, 100, z), XYZ(-100, 100, z), XYZ(100, -100, z))
+            skPl = SketchPlane.Create(doc, pl)
+
+            # 🔹 Raumbegrenzungslinien in Revit erzeugen
+            separatorarray = doc.Create.NewRoomBoundaryLines(skPl, curvearray, view)
+
+            # 🔹 Daten speichern
+            roomCreationData.append([level, [90, 90, z], separatorarray])
+
+print(roomCreationData)
