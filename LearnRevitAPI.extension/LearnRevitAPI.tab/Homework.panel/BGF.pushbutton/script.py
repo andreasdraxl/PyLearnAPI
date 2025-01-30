@@ -63,8 +63,6 @@ area_schemes = FilteredElementCollector(doc).OfClass(AreaScheme).ToElements()
 search_area_scheme = [i for i in area_schemes if i.Name == "Vermietbar"]
 area_scheme = search_area_scheme[0]
 
-for i in area_schemes:
-    print(i.Name)
 
 created_views = []
 
@@ -78,5 +76,29 @@ with revit.Transaction("create floorplans"):
     except:
         import traceback
         print(traceback.format_exc())
+
+# 1️⃣ all walls at level
+unique_wall = []
+
+for level in matching:
+    level_filter = ElementLevelFilter(level.Id)
+    
+    element_per_level = FilteredElementCollector(doc).WherePasses(level_filter).WhereElementIsNotElementType().ToElements()
+    # check = [i.Category.Name for i in element_per_level]
+    wall_per_level_and_Bauteil = []
+    
+    
+    for i in element_per_level:
+        if i.Category.Name == "Wände":
+            bauteil_param = i.LookupParameter("Bauteil")
+            if bauteil_param and bauteil_param.AsString():
+                wall_per_level_and_Bauteil.append(i)
+                
+    if wall_per_level_and_Bauteil:
+        unique_wall.append(wall_per_level_and_Bauteil[0])
+        
+for i in unique_wall:
+    print(i)
+
 
 # 0️⃣ create dummy rooms
