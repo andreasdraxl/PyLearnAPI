@@ -28,6 +28,7 @@ view  = doc.ActiveView
 # Get room category
 roomCategory = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Rooms)
 
+
 # Get subcategories for Color Fill and Interior Fill
 roomColorFill = None
 roomInteriorFill = None
